@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -41,5 +42,12 @@ public class IndexController {
     @GetMapping("/healthy")
     public String healthy() {
         return "发送成功";
+    }
+
+
+    @ApiOperation("workflow 执行状态查询")
+    @GetMapping("/workflowStatus")
+    public String workflowStatus(@RequestParam String workId) {
+        return algorithmWorker.getWorkFlowExecutionStatus(workId);
     }
 }

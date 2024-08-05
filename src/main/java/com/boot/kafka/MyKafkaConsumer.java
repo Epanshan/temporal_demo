@@ -37,8 +37,9 @@ public class MyKafkaConsumer {
 
 
     public List<String> cousmer() {
+        Map<Integer, ConsumerRecord<String, String>> recordMap = new HashMap<>();
+        List<String> result = new ArrayList<>();
         try {
-            List<String> result = new ArrayList<>();
             //配置消费者
             Map<String, Object> properties = kafkaProperties.buildConsumerProperties();
             properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");//指定消费组
@@ -59,7 +60,6 @@ public class MyKafkaConsumer {
 
             }
             Duration duration = Duration.ofSeconds(batchTime);
-            Map<Integer, ConsumerRecord<String, String>> recordMap = new HashMap<>();
             ConsumerRecords<String, String> records = kafkaConsumer.poll(duration);
             int count = records.count();
             if (count > 0) {
@@ -84,7 +84,7 @@ public class MyKafkaConsumer {
             }
 
         } catch (Exception e) {
-            recordMap.forEach((k, v) -> kafkaConsumer.seek(new TopicPartition(v.topic(), v.partition()), v.offset()));
+            //recordMap.forEach((k, v) -> kafkaConsumer.seek(new TopicPartition(v.topic(), v.partition()), v.offset()));
         } finally {
             LockUtils.LOCK.unlock();
         }

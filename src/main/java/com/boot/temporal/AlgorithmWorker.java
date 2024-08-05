@@ -6,7 +6,11 @@ import com.boot.temporal.activity.AlgorithmActivityImpl;
 import com.boot.temporal.po.WorkerStreamReq;
 import com.boot.temporal.workflow.*;
 import io.grpc.StatusRuntimeException;
+import io.temporal.api.common.v1.WorkflowExecution;
 import io.temporal.api.enums.v1.WorkflowIdReusePolicy;
+import io.temporal.api.workflow.v1.WorkflowExecutionInfo;
+import io.temporal.api.workflowservice.v1.DescribeWorkflowExecutionRequest;
+import io.temporal.api.workflowservice.v1.DescribeWorkflowExecutionResponse;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import io.temporal.client.WorkflowOptions;
@@ -274,5 +278,30 @@ public class AlgorithmWorker implements Shared {
                 throw e;
             }
         }
+    }
+
+    /**
+     * 获取 workflow 查询状态
+     *
+     * @param workId
+     */
+    public String getWorkFlowExecutionStatus(String workId) {
+        WorkflowExecution execution = client.newUntypedWorkflowStub(workId).getExecution();
+        String status = getStatusAsString(execution);
+        System.out.println(status);
+        return status;
+    }
+
+
+    private static String getStatusAsString(WorkflowExecution execution) {
+        DescribeWorkflowExecutionRequest describeWorkflowExecutionRequest =
+                DescribeWorkflowExecutionRequest.newBuilder()
+                        .setNamespace(client.getOptions().getNamespace())
+                        .setExecution(execution)
+                        .build();
+        DescribeWorkflowExecutionResponse resp = client.getWorkflowServiceStubs().blockingStub()
+                .describeWorkflowExecution(describeWorkflowExecutionRequest);
+        WorkflowExecutionInfo workflowExecutionInfo = resp.getWorkflowExecutionInfo();
+        return workflowExecutionInfo.getStatus().toString();
     }
 }
