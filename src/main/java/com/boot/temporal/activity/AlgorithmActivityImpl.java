@@ -90,7 +90,7 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
 
     @Override
     public void consumer() {
-        List<String> consumer = myKafkaConsumer.consumer();
+        List<String> consumer = myKafkaConsumer.newConsumer();
         if (consumer.size() > 0) {
             log.info("kafka 拉取消息:{} ,------------>>>>> 在此处你可以进行【打印】操作。", JSON.toJSONString(consumer));
         } else {
