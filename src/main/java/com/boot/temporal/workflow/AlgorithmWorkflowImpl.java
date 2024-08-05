@@ -7,6 +7,7 @@ import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
 import io.temporal.workflow.Async;
 import io.temporal.workflow.ChildWorkflowOptions;
+import io.temporal.workflow.Promise;
 import io.temporal.workflow.Workflow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.convert.DurationStyle;
@@ -43,6 +44,7 @@ public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
 
         AlgorithmActivity algorithmActivity = Workflow.newActivityStub(AlgorithmActivity.class, defaultActivityOptions);
         String sequence = req.getSequence(), memo = req.getMemo();
+        List<Promise<String>> promiseList = new ArrayList<>();
 
         List<String> workIds = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
@@ -52,13 +54,14 @@ public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
                     ChildWorkflowOptions.newBuilder().setWorkflowId(uuid)
                             .build();
             HelloChildWorkFlow child = Workflow.newChildWorkflowStub(HelloChildWorkFlow.class, workflowOptions);
-            Async.function(child::sendMessage, req);
+            Promise<String> function = Async.function(child::sendMessage, req);
+            promiseList.add(function);
         }
         log.info("开始执行编排逻辑。sequence：{} memo：{}", sequence, memo);
-
         algorithmActivity.terminateHandle();
         algorithmActivity.terminate(workIds);
         log.info("<<<<<执行编排的所有业务逻辑完成>>>>>");
+        Promise.allOf(promiseList).get();
     }
 }
 // @@@SNIPEND

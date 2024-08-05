@@ -1,5 +1,6 @@
 package com.boot.temporal.activity;
 
+import com.alibaba.fastjson.JSON;
 import com.boot.common.BeanContext;
 import com.boot.common.HeartbeatThread;
 import com.boot.common.Shared;
@@ -8,6 +9,7 @@ import com.boot.temporal.AlgorithmWorker;
 import com.boot.temporal.manager.Algorithm1Manager;
 import com.boot.temporal.manager.BaseManager;
 import com.boot.temporal.po.WorkerStreamReq;
+import com.google.gson.JsonObject;
 import io.temporal.activity.Activity;
 import io.temporal.activity.ActivityExecutionContext;
 import io.temporal.activity.ActivityInfo;
@@ -55,7 +57,7 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
         workerStreamReq.setMemo("0");
         workerStreamReq.setType(1);
         kafkaTemplate.send("samples-topic", workerStreamReq.getSequence());
-        log.info("{} ------------>>>>> 在此处你可以进行【打印】操作。", workerStreamReq);
+        log.info("kafka 生产消息:{} ,------------>>>>> 在此处你可以进行【打印】操作。", workerStreamReq);
     }
 
     @Override
@@ -88,8 +90,12 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
 
     @Override
     public void consumer() {
-        List<String> cousmer = myKafkaConsumer.consumer();
-        log.info("{} ------------>>>>> 在此处你可以进行【打印】操作。", "cousmer");
+        List<String> consumer = myKafkaConsumer.consumer();
+        if (consumer.size() > 0) {
+            log.info("kafka 拉取消息:{} ,------------>>>>> 在此处你可以进行【打印】操作。", JSON.toJSONString(consumer));
+        } else {
+            log.info("kafka 没有新消息。");
+        }
     }
 
     @Override

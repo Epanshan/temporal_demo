@@ -13,6 +13,5 @@ public class HelloChildConsumerWorkFlowImpl implements HelloChildConsumerWorkFlo
     @Override
     public void consumer() {
         activity.consumer();
-
     }
 }

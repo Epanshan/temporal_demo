@@ -42,6 +42,7 @@ public class AlgorithmConsumerWorkflowImpl implements AlgorithmConsumerWorkflow 
         AlgorithmActivity algorithmActivity = Workflow.newActivityStub(AlgorithmActivity.class, defaultActivityOptions);
         String sequence = req.getSequence(), memo = req.getMemo();
         List<String> workIds = new ArrayList<>();
+        List<Promise<Void>> promiseList = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
             String uuid = Workflow.randomUUID().toString();
@@ -49,12 +50,14 @@ public class AlgorithmConsumerWorkflowImpl implements AlgorithmConsumerWorkflow 
             ChildWorkflowOptions workflowOptions =
                     ChildWorkflowOptions.newBuilder().setWorkflowId(uuid).build();
             HelloChildConsumerWorkFlow child = Workflow.newChildWorkflowStub(HelloChildConsumerWorkFlow.class, workflowOptions);
-            Async.procedure(child::consumer);
+            Promise<Void> procedure = Async.procedure(child::consumer);
+            promiseList.add(procedure);
         }
         log.info("开始执行编排逻辑。sequence：{} memo：{}", sequence, memo);
         algorithmActivity.terminateHandleConsumer();
         algorithmActivity.terminateConsumer(workIds);
         log.info("<<<<<执行编排的所有业务逻辑完成>>>>>");
+        Promise.allOf(promiseList).get();
     }
 }
 // @@@SNIPEND
