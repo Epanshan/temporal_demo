@@ -8,7 +8,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,35 +28,41 @@ public class MyKafkaConsumer {
     @Resource
     private KafkaProperties kafkaProperties;
 
+    private KafkaConsumer<String, String> kafkaConsumer;
+
     @PostConstruct
     public void init() {
-
-        //cousmer();
+        //配置消费者
+        Map<String, Object> properties = kafkaProperties.buildConsumerProperties();
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");//指定消费组
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, batchSize); //指定批次消费条数
+        properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); //禁用自动提交
+        //建立消费者
+        kafkaConsumer = new KafkaConsumer<>(properties);
+        System.out.println(1111);
     }
 
 
-    public List<String> cousmer() {
+    public List<String> consumer() {
         Map<Integer, ConsumerRecord<String, String>> recordMap = new HashMap<>();
         List<String> result = new ArrayList<>();
         try {
-            //配置消费者
+        /*    //配置消费者
             Map<String, Object> properties = kafkaProperties.buildConsumerProperties();
             properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");//指定消费组
             properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, batchSize); //指定批次消费条数
             properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); //禁用自动提交
             //建立消费者
-            KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);
+            KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);*/
             //获取所有partition信息
             List<PartitionInfo> partitionList = kafkaConsumer.partitionsFor("samples-topic");
             Map<TopicPartition, Integer> topicPartitionMap = new HashMap<>();
-            partitionList.forEach(item
-                    -> topicPartitionMap.put(new TopicPartition(item.topic(), item.partition()), item.partition()));
+            partitionList.forEach(item -> topicPartitionMap.put(new TopicPartition(item.topic(), item.partition()), item.partition()));
             //订阅topic并设置起始offset
             kafkaConsumer.assign(topicPartitionMap.keySet());
             topicPartitionMap.forEach(kafkaConsumer::seek);
             long starTime = System.currentTimeMillis();
             while (!LockUtils.LOCK.tryLock() && System.currentTimeMillis() - starTime > 10000L) {
-
             }
             Duration duration = Duration.ofSeconds(batchTime);
             ConsumerRecords<String, String> records = kafkaConsumer.poll(duration);
@@ -82,9 +87,8 @@ public class MyKafkaConsumer {
                 //正常提交后清除记录
                 recordMap.clear();
             }
-
         } catch (Exception e) {
-            //recordMap.forEach((k, v) -> kafkaConsumer.seek(new TopicPartition(v.topic(), v.partition()), v.offset()));
+            recordMap.forEach((k, v) -> kafkaConsumer.seek(new TopicPartition(v.topic(), v.partition()), v.offset()));
         } finally {
             LockUtils.LOCK.unlock();
         }

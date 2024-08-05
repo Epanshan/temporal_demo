@@ -88,7 +88,7 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
 
     @Override
     public void consumer() {
-        List<String> cousmer = myKafkaConsumer.cousmer();
+        List<String> cousmer = myKafkaConsumer.consumer();
         log.info("{} ------------>>>>> 在此处你可以进行【打印】操作。", "cousmer");
     }
 
