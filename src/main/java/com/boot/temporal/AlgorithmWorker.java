@@ -6,6 +6,7 @@ import com.boot.temporal.activity.AlgorithmActivityImpl;
 import com.boot.temporal.po.WorkerStreamReq;
 import com.boot.temporal.workflow.*;
 import io.grpc.StatusRuntimeException;
+import io.temporal.api.enums.v1.WorkflowIdReusePolicy;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import io.temporal.client.WorkflowOptions;
@@ -25,6 +26,8 @@ import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static io.temporal.api.enums.v1.WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING;
 
 /**
  * 功能描述: 算法工人
@@ -149,6 +152,7 @@ public class AlgorithmWorker implements Shared {
                         .setWorkflowId("CronHelloSample")
                         .setTaskQueue(ALGORITHM_TASK_QUEUE)
                         .setCronSchedule("0/1 * * * ?")
+                        .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING)
                         .build();
 
         AlgorithmWorkflow workflow = client.newWorkflowStub(AlgorithmWorkflow.class, workflowOptions);
@@ -159,7 +163,7 @@ public class AlgorithmWorker implements Shared {
        /* workflow.run(workerStreamReq, new TemporalConfig(initialInterval, maximumInterval, backoffCoefficient
                 , maximumAttempts, startToCloseTimeout, heartbeatTimeout));*/
 
-        new Thread(()->{
+        new Thread(() -> {
             workflow.run(workerStreamReq, new TemporalConfig(initialInterval, maximumInterval, backoffCoefficient
                     , maximumAttempts, startToCloseTimeout, heartbeatTimeout));
         }).start();
@@ -168,6 +172,7 @@ public class AlgorithmWorker implements Shared {
                         .setWorkflowId("CronHelloSampleConsumer")
                         .setTaskQueue(ALGORITHM_CONSUMER_TASK_QUEUE)
                         .setCronSchedule("0/2 * * * ?")
+                        .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING)
                         .build();
 
         AlgorithmConsumerWorkflow workflowConsumer = client.newWorkflowStub(AlgorithmConsumerWorkflow.class, workflowConsumerOptions);
@@ -175,7 +180,7 @@ public class AlgorithmWorker implements Shared {
         consumer.setSequence(UUID.randomUUID().toString());
         consumer.setMemo("0");
         consumer.setType(1);
-        new Thread(()->{
+        new Thread(() -> {
             workflowConsumer.run(consumer, new TemporalConfig(initialInterval, maximumInterval, backoffCoefficient
                     , maximumAttempts, startToCloseTimeout, heartbeatTimeout));
         }).start();

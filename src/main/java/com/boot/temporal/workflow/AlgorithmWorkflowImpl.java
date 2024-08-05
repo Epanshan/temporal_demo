@@ -49,7 +49,8 @@ public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
             String uuid = Workflow.randomUUID().toString();
             workIds.add(uuid);
             ChildWorkflowOptions workflowOptions =
-                    ChildWorkflowOptions.newBuilder().setWorkflowId(uuid).build();
+                    ChildWorkflowOptions.newBuilder().setWorkflowId(uuid)
+                            .build();
             HelloChildWorkFlow child = Workflow.newChildWorkflowStub(HelloChildWorkFlow.class, workflowOptions);
             Async.function(child::sendMessage, req);
         }
