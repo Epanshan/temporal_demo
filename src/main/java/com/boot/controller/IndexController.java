@@ -53,7 +53,7 @@ public class IndexController {
 
     @ApiOperation("workflow 执行状态查询")
     @GetMapping("/workflowCount")
-    public int workflowCount(@RequestParam String workId) {
-        return algorithmWorker.getWorkFlowExecutionCount(workId);
+    public int workflowCount(@RequestParam String workId, @RequestParam String runId) {
+        return algorithmWorker.getWorkFlowExecutionCount(workId, runId);
     }
 }

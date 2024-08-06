@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -174,7 +175,7 @@ public class AlgorithmWorker implements Shared {
                 WorkflowOptions.newBuilder()
                         .setWorkflowId("CronHelloSampleConsumer")
                         .setTaskQueue(ALGORITHM_CONSUMER_TASK_QUEUE)
-                        .setCronSchedule("0/1 * * * ?")
+                        .setCronSchedule("0/2 * * * ?")
                         .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING)
                         .build();
 
@@ -292,9 +293,14 @@ public class AlgorithmWorker implements Shared {
     }
 
 
-    public int getWorkFlowExecutionCount(String workId) {
-        WorkflowStub workflowStub = client.newUntypedWorkflowStub(workId);
-        String queryName = workflowStub.query("queryName", String.class);
+    public int getWorkFlowExecutionCount(String workId, String runId) {
+        Optional<String> optional;
+        if (runId == null || runId.isEmpty()) {
+            optional = Optional.empty();
+        } else {
+            optional = Optional.of(runId);
+        }
+        WorkflowStub workflowStub = client.newUntypedWorkflowStub(workId,optional,Optional.empty());
         return workflowStub.query("queryCount", Integer.class);
     }
 
