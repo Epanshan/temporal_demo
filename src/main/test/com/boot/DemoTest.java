@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.UUID;
 
+import static com.boot.temporal.AlgorithmWorker.client;
 import static io.temporal.internal.logging.LoggerTag.WORKFLOW_ID;
 
 public class DemoTest {
@@ -28,7 +29,7 @@ public class DemoTest {
             TestWorkflowRule.newBuilder().setWorkflowTypes(AlgorithmWorkflowImpl.class, HelloChildWorkFlowImpl.class).build();
 
 
-   private void setUp() {
+    private void setUp() {
         // Get a workflow stub using the same task queue the worker uses.
         WorkflowOptions workflowOptions =
                 WorkflowOptions.newBuilder()
@@ -50,6 +51,9 @@ public class DemoTest {
     }
 
 
+    /**
+     * @throws Exception
+     */
     @Test
     public void testStatus() throws Exception {
         setUp();
@@ -72,8 +76,19 @@ public class DemoTest {
     }
 
 
+    /**
+     * 模拟发送消息成功，增加workflow 发送成功内存数量；
+     */
     @Test
     public void testCount() {
+        setUp();
+        testWorkflowRule.getWorkflowClient().newUntypedWorkflowStub(WORKFLOW_ID + 1).signal("increaseCount");
+        testWorkflowRule.getWorkflowClient().newUntypedWorkflowStub(WORKFLOW_ID + 1).signal("increaseCount");
+        Integer queryCount = testWorkflowRule.getWorkflowClient().newUntypedWorkflowStub(WORKFLOW_ID + 1).query("queryCount", Integer.class);
+
+        System.out.println("*******************************************************");
+        System.out.println(queryCount);
+        System.out.println("*******************************************************");
 
     }
 
