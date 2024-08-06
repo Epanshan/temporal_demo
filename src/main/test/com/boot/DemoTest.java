@@ -14,11 +14,9 @@ import io.temporal.client.WorkflowOptions;
 import io.temporal.testing.TestWorkflowRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.UUID;
 
-import static com.boot.temporal.AlgorithmWorker.client;
 import static io.temporal.internal.logging.LoggerTag.WORKFLOW_ID;
 
 public class DemoTest {
