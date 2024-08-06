@@ -21,6 +21,7 @@ public class HelloChildWorkFlowImpl implements HelloChildWorkFlow {
     @Override
     public String sendMessage(WorkerStreamReq req) {
         activity.send();
+
         return "";
     }
 }

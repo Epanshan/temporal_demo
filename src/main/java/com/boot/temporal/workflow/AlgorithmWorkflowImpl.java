@@ -14,9 +14,13 @@ import org.springframework.boot.convert.DurationStyle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
+
+
+    private AtomicInteger sendCount = new AtomicInteger();
 
     // 传输方法是工作流的入口点。
     // 活动方法的执行可以在此处或从其他活动方法中进行编排
@@ -45,9 +49,8 @@ public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
         AlgorithmActivity algorithmActivity = Workflow.newActivityStub(AlgorithmActivity.class, defaultActivityOptions);
         String sequence = req.getSequence(), memo = req.getMemo();
         List<Promise<String>> promiseList = new ArrayList<>();
-
         List<String> workIds = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 2; i++) {
             String uuid = Workflow.randomUUID().toString();
             workIds.add(uuid);
             ChildWorkflowOptions workflowOptions =
@@ -63,5 +66,16 @@ public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
         log.info("<<<<<执行编排的所有业务逻辑完成>>>>>");
         Promise.allOf(promiseList).get();
     }
+
+
+    @Override
+    public void increaseCount() {
+        sendCount.incrementAndGet();
+        System.out.println("***********" + sendCount.get());
+    }
+
+    @Override
+    public Integer queryCount() {
+        return sendCount.get();
+    }
 }
-// @@@SNIPEND

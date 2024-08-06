@@ -31,7 +31,7 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
 
     private Algorithm1Manager algorithm1Manager;
     private BaseManager baseManager;
-    private AlgorithmWorker AlgorithmWorker;
+    private AlgorithmWorker algorithmWorker;
 
     private KafkaTemplate<String, String> kafkaTemplate;
 
@@ -44,7 +44,7 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
         log.info("加载初始Bean实例信息");
         baseManager = BeanContext.getBean(BaseManager.class);
         algorithm1Manager = BeanContext.getBean(Algorithm1Manager.class);
-        AlgorithmWorker = BeanContext.getBean(AlgorithmWorker.class);
+        algorithmWorker = BeanContext.getBean(AlgorithmWorker.class);
         kafkaTemplate = BeanContext.getBean(KafkaTemplate.class);
         myKafkaConsumer = BeanContext.getBean(MyKafkaConsumer.class);
         this.redisTemplate = redisTemplate;
@@ -58,6 +58,7 @@ public class AlgorithmActivityImpl implements AlgorithmActivity {
         workerStreamReq.setType(1);
         kafkaTemplate.send("samples-topic", workerStreamReq.getSequence());
         log.info("kafka 生产消息:{} ,------------>>>>> 在此处你可以进行【打印】操作。", workerStreamReq);
+        client().newUntypedWorkflowStub("CronHelloSample").signal("increaseCount");
     }
 
     @Override

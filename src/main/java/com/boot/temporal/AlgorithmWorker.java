@@ -7,13 +7,13 @@ import com.boot.temporal.po.WorkerStreamReq;
 import com.boot.temporal.workflow.*;
 import io.grpc.StatusRuntimeException;
 import io.temporal.api.common.v1.WorkflowExecution;
-import io.temporal.api.enums.v1.WorkflowIdReusePolicy;
 import io.temporal.api.workflow.v1.WorkflowExecutionInfo;
 import io.temporal.api.workflowservice.v1.DescribeWorkflowExecutionRequest;
 import io.temporal.api.workflowservice.v1.DescribeWorkflowExecutionResponse;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import io.temporal.client.WorkflowOptions;
+import io.temporal.client.WorkflowStub;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 import io.temporal.serviceclient.WorkflowServiceStubsOptions;
 import io.temporal.worker.Worker;
@@ -175,7 +175,7 @@ public class AlgorithmWorker implements Shared {
                 WorkflowOptions.newBuilder()
                         .setWorkflowId("CronHelloSampleConsumer")
                         .setTaskQueue(ALGORITHM_CONSUMER_TASK_QUEUE)
-                        .setCronSchedule("0/2 * * * ?")
+                        .setCronSchedule("0/1 * * * ?")
                         .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING)
                         .build();
 
@@ -290,6 +290,12 @@ public class AlgorithmWorker implements Shared {
         String status = getStatusAsString(execution);
         System.out.println(status);
         return status;
+    }
+
+
+    public int getWorkFlowExecutionCount(String workId) {
+        WorkflowStub workflowStub = client.newUntypedWorkflowStub(workId);
+        return workflowStub.query("queryCount", Integer.class);
     }
 
 
