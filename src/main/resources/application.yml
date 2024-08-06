@@ -4,8 +4,8 @@ spring:
       max-file-size: -1
       max-request-size: -1
   kafka:
-    ##bootstrap-servers: 127.0.0.1:9092
-    bootstrap-servers: 10.110.80.58:9092
+    bootstrap-servers: 127.0.0.1:9092
+    #bootstrap-servers: 10.99.11.202:9092
 
   redis:
     host: 127.0.0.1
@@ -36,7 +36,7 @@ configuration:
     initWorkflowSize: 1
     ## temporal 连接url
     target: 127.0.0.1:7233
-    #target: 10.108.10.180:7233
+    #target: 10.104.17.9:7233
     ## 最大并发工作流任务执行大小（默认200）
     maxConcurrentWorkflowTaskExecutionSize: 20
     ## 最大并发活动执行大小（默认200）

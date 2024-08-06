@@ -50,7 +50,7 @@ public class AlgorithmWorkflowImpl implements AlgorithmWorkflow {
         String sequence = req.getSequence(), memo = req.getMemo();
         List<Promise<String>> promiseList = new ArrayList<>();
         List<String> workIds = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 2; i++) {
             String uuid = Workflow.randomUUID().toString();
             workIds.add(uuid);
             ChildWorkflowOptions workflowOptions =

@@ -86,7 +86,6 @@ public class AlgorithmWorker implements Shared {
     //@PostConstruct
     public void init() {
 
-        //redisTest();
         WorkflowServiceStubsOptions workflowServiceStubsOptions = WorkflowServiceStubsOptions.newBuilder()
                 .setTarget(target)
                 .setHealthCheckTimeout(Duration.ofSeconds(100))
@@ -175,7 +174,7 @@ public class AlgorithmWorker implements Shared {
                 WorkflowOptions.newBuilder()
                         .setWorkflowId("CronHelloSampleConsumer")
                         .setTaskQueue(ALGORITHM_CONSUMER_TASK_QUEUE)
-                        .setCronSchedule("0/2 * * * ?")
+                        .setCronSchedule("0/1 * * * ?")
                         .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING)
                         .build();
 
@@ -295,6 +294,7 @@ public class AlgorithmWorker implements Shared {
 
     public int getWorkFlowExecutionCount(String workId) {
         WorkflowStub workflowStub = client.newUntypedWorkflowStub(workId);
+        String queryName = workflowStub.query("queryName", String.class);
         return workflowStub.query("queryCount", Integer.class);
     }
 
@@ -310,4 +310,5 @@ public class AlgorithmWorker implements Shared {
         WorkflowExecutionInfo workflowExecutionInfo = resp.getWorkflowExecutionInfo();
         return workflowExecutionInfo.getStatus().toString();
     }
+
 }
