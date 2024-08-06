@@ -175,7 +175,7 @@ public class AlgorithmWorker implements Shared {
                 WorkflowOptions.newBuilder()
                         .setWorkflowId("CronHelloSampleConsumer")
                         .setTaskQueue(ALGORITHM_CONSUMER_TASK_QUEUE)
-                        .setCronSchedule("0/1 * * * ?")
+                        .setCronSchedule("0/2 * * * ?")
                         .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING)
                         .build();
 

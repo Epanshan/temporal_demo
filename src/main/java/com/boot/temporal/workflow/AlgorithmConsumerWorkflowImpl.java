@@ -44,7 +44,7 @@ public class AlgorithmConsumerWorkflowImpl implements AlgorithmConsumerWorkflow 
         List<String> workIds = new ArrayList<>();
         List<Promise<Void>> promiseList = new ArrayList<>();
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 100; i++) {
             String uuid = Workflow.randomUUID().toString();
             workIds.add(uuid);
             ChildWorkflowOptions workflowOptions =
